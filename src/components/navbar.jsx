@@ -4,10 +4,9 @@ class NavBar extends Component {
         return (
             <nav class="navbar bg-light">
             <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">Navbar</span>
+            <span class="navbar-brand mb-0 h1">{this.props.totalCounts}</span>
   </div>
 </nav>
-
         );
     }
 }
