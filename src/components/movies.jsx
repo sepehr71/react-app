@@ -6,23 +6,27 @@ class Movies extends Component {
     state = {  
         movies : getMovies()
     } 
+    pagination = {
+      p_movies : this.state.movies.map( movie => (
+      
+      ))
+    }
     handleDelete = movie => {
        const movies = this.state.movies.filter( m => m._id !== movie._id);
        this.setState({movies})
     };
     handlelikebtn = movie => {
-
       const movies = [...this.state.movies];
       const index = movies.indexOf(movie);
       movies[index]={...movies[index]};
       movies[index].liked = !movies[index].liked;
       this.setState({movies})
-      console.log(this.state.movies);
     }
     render() { 
         return (
+          
              this.state.movies.length === 0 ? <h1>there is no movies</h1> :
-             <div>
+             <div className='container'>
              <p id='top-info'>there are {this.state.movies.length} movies in the table</p>
              <table className='table'>
                 <thead>
@@ -48,6 +52,15 @@ class Movies extends Component {
                   ))}
                 </tbody>
             </table>
+           
+            <nav aria-label="Page navigation example">
+              <ul className="pagination">    
+              {this.state.movies.map( movie => (
+                <li className="page-item"><a className="page-link" href="#">{}</a></li>                  
+              ))}
+              </ul>
+            </nav>
+
             </div>
         );
     }
