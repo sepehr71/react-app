@@ -1,20 +1,19 @@
-
 import React, { Component } from 'react';
 import {getMovies} from '../services/fakeMovieService';
+import Pagination from './common/pagination';
 
 class Movies extends Component {
+
     state = {  
-        movies : getMovies()
+        movies : getMovies(),
+        pageSize :4
     } 
-    pagination = {
-      p_movies : this.state.movies.map( movie => (
-      
-      ))
-    }
+
     handleDelete = movie => {
        const movies = this.state.movies.filter( m => m._id !== movie._id);
        this.setState({movies})
     };
+
     handlelikebtn = movie => {
       const movies = [...this.state.movies];
       const index = movies.indexOf(movie);
@@ -22,9 +21,15 @@ class Movies extends Component {
       movies[index].liked = !movies[index].liked;
       this.setState({movies})
     }
-    render() { 
+
+    handlePageChange = page => {
+      console.log("page change");
+    }
+
+    render() {
+      const {length : count} = this.state.movies 
         return (
-          
+             
              this.state.movies.length === 0 ? <h1>there is no movies</h1> :
              <div className='container'>
              <p id='top-info'>there are {this.state.movies.length} movies in the table</p>
@@ -52,15 +57,7 @@ class Movies extends Component {
                   ))}
                 </tbody>
             </table>
-           
-            <nav aria-label="Page navigation example">
-              <ul className="pagination">    
-              {this.state.movies.map( movie => (
-                <li className="page-item"><a className="page-link" href="#">{}</a></li>                  
-              ))}
-              </ul>
-            </nav>
-
+            <Pagination itemsCount = {count} pageSize = {this.state.pageSize} onPageChange = {this.handlePageChange}  />
             </div>
         );
     }
