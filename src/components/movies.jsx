@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import {getMovies} from '../services/fakeMovieService';
 import Pagination from './common/pagination';
+import {paginate} from '../utils/paginate';
 
 class Movies extends Component {
 
     state = {  
         movies : getMovies(),
-        pageSize :4
+        pageSize :4,
+        currentPage : 1
     } 
 
     handleDelete = movie => {
@@ -21,18 +23,20 @@ class Movies extends Component {
       movies[index].liked = !movies[index].liked;
       this.setState({movies})
     }
-
-    handlePageChange = page => {
-      console.log("page change");
+    
+    handlePageChange = page => { 
+           this.setState({currentPage:page});
     }
 
     render() {
-      const {length : count} = this.state.movies 
+      const {length : count} = this.state.movies ;
+      const {currentPage ,pageSize,movies:allMovies } = this.state;
+      if(count===0) return <h1>there is no movies</h1> ;
+      const movies = paginate(allMovies,currentPage,pageSize);
+
         return (
-             
-             this.state.movies.length === 0 ? <h1>there is no movies</h1> :
              <div className='container'>
-             <p id='top-info'>there are {this.state.movies.length} movies in the table</p>
+             <p id='top-info'>there are {allMovies.length} movies in the table</p>
              <table className='table'>
                 <thead>
                   <tr>
@@ -45,19 +49,23 @@ class Movies extends Component {
                   </tr>
                 </thead>
                 <tbody>
-                  {this.state.movies.map(movie => (
-                     <tr key={movie._id}>
+                  {movies.map(movie => (
+                    <tr key={movie._id}>
                       <td>{movie.title}</td>
                       <td>{movie.genre.name}</td>
                       <td>{movie.numberInStock}</td>
                       <td>{movie.dailyRentalRate}</td>
                       <td><i className={movie.liked === true ? "fa fa-heart" : "fa fa-heart-o" } onClick={()=>this.handlelikebtn(movie)}/></td>
                       <td><button className='btn btn-danger' onClick={()=>this.handleDelete(movie)}>Delete</button></td>
-                     </tr>
+                    </tr>
                   ))}
                 </tbody>
             </table>
-            <Pagination itemsCount = {count} pageSize = {this.state.pageSize} onPageChange = {this.handlePageChange}  />
+            <Pagination 
+               itemsCount = {count}
+               pageSize = {pageSize} 
+               currentPage = {currentPage}
+               onPageChange = {this.handlePageChange}  />
             </div>
         );
     }
