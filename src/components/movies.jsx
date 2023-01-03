@@ -5,6 +5,7 @@ import {paginate} from '../utils/paginate';
 import ListGroup from './common/listGroup';
 import {getGenres} from '../services/fakeGenreService';
 import MoviesTable from './moviesTable';
+import _ from 'lodash';
 
 class Movies extends Component {
 
@@ -13,10 +14,11 @@ class Movies extends Component {
         genres : [],
         pageSize : 4,
         currentPage : 1,
-        currentGenre : "thriller"
+        currentGenre:"",
+        sortColumn : {path:"title", order:"asc"}
     } ;
     componentDidMount(){
-      const genres = [{name:"All Genres"} , ...getGenres()]
+      const genres = [{_id:"" , name:"All Genres"} , ...getGenres()]
       this.setState({movies:getMovies() , genres })
     }
 
@@ -35,22 +37,29 @@ class Movies extends Component {
     
     handlePageChange = page => { 
            this.setState({currentPage:page});
-
+           
     }
     
    handleItemSelect = genre => {
-        
+          
           this.setState({currentGenre:genre,currentPage:1})
+   }
+   handleSort = sortColumn => {
+      
+       this.setState({sortColumn})
    }
 
     render() {
       const {length : count} = this.state.movies ;
-      const {currentPage ,pageSize,movies:allMovies,genres,currentGenre } = this.state;
+      const {currentPage ,pageSize,movies:allMovies,genres,currentGenre,sortColumn } = this.state;
 
       if(count===0) return <h1>there is no movies</h1> ;
-
+      
       const filtered = currentGenre && currentGenre._id  ? allMovies.filter( m => m.genre._id === currentGenre._id) : allMovies;
-      const movies = paginate(filtered,currentPage,pageSize);
+
+      const sorted = _.orderBy(filtered , [sortColumn.path] , [sortColumn.order])     
+ 
+      const movies = paginate(sorted,currentPage,pageSize);
       
         return (
           <div className='container'>
@@ -66,8 +75,10 @@ class Movies extends Component {
              <p id='top-info'>there are {filtered.length} movies in the table</p>
              <MoviesTable
               onDelete = {this.handleDelete}
+              sortColumn = {sortColumn}
               onLikeBtn = {this.handlelikebtn}
               movies = {movies}
+              onSort = {this.handleSort}
               />
             <Pagination 
                itemsCount = {filtered.length}
