@@ -34,33 +34,36 @@ class Movies extends Component {
       movies[index].liked = !movies[index].liked;
       this.setState({movies})
     }
-    
     handlePageChange = page => { 
            this.setState({currentPage:page});
-           
     }
-    
    handleItemSelect = genre => {
-          
           this.setState({currentGenre:genre,currentPage:1})
    }
    handleSort = sortColumn => {
-      
           this.setState({sortColumn})
    }
 
-    render() {
-      const {length : count} = this.state.movies ;
-      const {currentPage ,pageSize,movies:allMovies,genres,currentGenre,sortColumn } = this.state;
+    getPageData = () => {
 
-      if(count===0) return <h1>there is no movies</h1> ;
-      
+      const {currentPage ,pageSize,movies:allMovies,genres,currentGenre,sortColumn } = this.state;
       const filtered = currentGenre && currentGenre._id  ? allMovies.filter( m => m.genre._id === currentGenre._id) : allMovies;
 
       const sorted = _.orderBy(filtered , [sortColumn.path] , [sortColumn.order])     
  
-      const movies = paginate(sorted,currentPage,pageSize);
+      const movies = paginate(sorted,currentPage,pageSize); 
+
+      return {totalCount: filtered.length , data : movies };
       
+    }
+    render() {
+      const {length : count} = this.state.movies ;
+      const {currentPage ,pageSize,genres,currentGenre,sortColumn } = this.state;
+
+      if(count===0) return <h1>there is no movies</h1> ;
+
+      const {totalCount , data : movies } = this.getPageData();
+     
         return (
           <div className='container'>
              <div className='row'>
@@ -72,7 +75,7 @@ class Movies extends Component {
                  />
               </div>
               <div className='col'>
-             <p id='top-info'>there are {filtered.length} movies in the table</p>
+             <p id='top-info'>there are {totalCount} movies in the table</p>
              <MoviesTable
               onDelete = {this.handleDelete}
               sortColumn = {sortColumn}
@@ -81,7 +84,7 @@ class Movies extends Component {
               onSort = {this.handleSort}
               />
             <Pagination 
-               itemsCount = {filtered.length}
+               itemsCount = {totalCount}
                pageSize = {pageSize} 
                currentPage = {currentPage}
                onPageChange = {this.handlePageChange}  />
